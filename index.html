@@ -11,6 +11,9 @@
    * {
      box-sizing: border-box;
    }
+   html {
+      background-color: #000;
+    }
    body {
      margin: 0;
      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -67,6 +70,15 @@
      color: gray;
     
    }
+   .refresh-title {
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent; /* Ẩn hiệu ứng highlight trên thiết bị di động */
+    }
+    .refresh-title:focus,
+    .refresh-title:active {
+      outline: none;
+      box-shadow: none;
+    }
    .status {
      margin-top: 8px;
      color: #00cc66;
@@ -83,6 +95,7 @@
     color: #e5d8b7;
     line-height: 1.7;
     text-align: -webkit-left;
+    text-indent: 1.5em;
 }
    .bottom-bar {
      width: 100%;
@@ -106,7 +119,7 @@
 <div class="time" id="currentTime">--</div>
 <div id="qrcode"></div>
 <div class="refresh">
-  <p onclick="generateQRCode()" class="refresh-title">申请离场</p>
+  <p onclick="generateQRCode(event)" class="refresh-title">申请离场</p>
   <p class="refresh-title">刷新二维码</p>
 </div>
 <div class="status">已生效</div>
@@ -134,7 +147,10 @@
      const validTimeStr = `${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
      document.getElementById('validTime').textContent = validTimeStr;
    }
-   function generateQRCode() {
+   function generateQRCode(event) {
+    if (event && event.currentTarget) {
+        event.currentTarget.blur();
+      }
   // Tạo dữ liệu URL với id ngẫu nhiên
   const randomId = Math.floor(Math.random() * 1000000);
   const data = "https://example.com/entry?id=" + randomId;
@@ -155,7 +171,7 @@
     colorDark: "#000000",
     colorLight: "#ffffff",
     correctLevel: QRCode.CorrectLevel.H,
-    typeNumber: 4  // Ép QR Code dùng phiên bản 4 thay vì tự động chọn.
+    typeNumber: 40  // Ép QR Code dùng phiên bản 4 thay vì tự động chọn.
   };
   
   new QRCode(qrcodeElement, options);
@@ -168,7 +184,39 @@
    // Update every second
    setInterval(updateTime, 1000);
    setInterval(updateValidTime, 1000);
+  function fadeElement(selector, speed = 0.008) {
+  const element = document.querySelector(selector);
+  if (!element) {
+    console.error("Không tìm thấy phần tử với selector:", selector);
+    return;
+  }
 
+  let opacity = 1;      // Giá trị opacity ban đầu
+  let fadingOut = true; // Cờ kiểm soát trạng thái: mờ dần hay tăng dần
+
+  function animate() {
+    if (fadingOut) {
+      opacity -= speed;
+      if (opacity <= 0) {
+        opacity = 0;
+        fadingOut = false; // Khi mờ hết, chuyển sang tăng dần
+      }
+    } else {
+      opacity += speed;
+      if (opacity >= 1) {
+        opacity = 1;
+        fadingOut = true;  // Khi hiện đầy đủ, chuyển về mờ dần
+      }
+    }
+    element.style.opacity = opacity;
+    requestAnimationFrame(animate);
+  }
+
+  animate(); // Khởi chạy hiệu ứng
+}
+
+// Ví dụ gọi hàm với phần tử có class "status":
+fadeElement('.status');
 </script>
 </body>
 </html>
