@@ -14,16 +14,18 @@
    body {
      margin: 0;
      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-     background-image: url("background.png");
+     background-image: url("background.png") ;
+     background-repeat: no-repeat;
+     color: white;
      display: flex;
      flex-direction: column;
      align-items: center;
      padding: 0;
+      background-size: cover;
    }
    .header {
      margin-top: 40px;
      font-size: 18px;
-     font-weight: 400;
      color: #f5d68a;
    }
    .card {
@@ -37,7 +39,7 @@
    }
    .card-header {
      background-color: #f4c540;
-     padding: 12px;
+     padding: 30px 12px 30px 12px;
      text-align: center;
      color: white;
      font-size: 16px;
@@ -53,13 +55,16 @@
    }
    #qrcode {
      margin: auto;
-     width: 250px;
-     height: 250px;
+     width: 300px;
+     height: 300px;
    }
    .refresh {
-     margin-top: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
      font-size: 14px;
      color: gray;
+    
    }
    .status {
      margin-top: 8px;
@@ -84,8 +89,11 @@
      background-color: transparent;
    }
    img{
-    width: 250px;
-    height: 250px;
+    width: 300px;
+    height: 300px;
+   }
+   .refresh-title{
+    padding: 0 10px;
    }
 </style>
 </head>
@@ -96,7 +104,10 @@
 <div class="card-body">
 <div class="time" id="currentTime">--</div>
 <div id="qrcode"></div>
-<div class="refresh">刷新二维码</div>
+<div class="refresh">
+  <p onclick="generateQRCode()" class="refresh-title">申请离场</p>
+  <p class="refresh-title">刷新二维码</p>
+</div>
 <div class="status">已生效</div>
 <div class="valid-time" id="validTime">--</div>
 </div>
@@ -119,30 +130,44 @@
    function updateValidTime(minutesToAdd = 3) {
      const now = new Date();
      now.setMinutes(now.getMinutes() + minutesToAdd);
-     const validTimeStr = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+     const validTimeStr = `${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
      document.getElementById('validTime').textContent = validTimeStr;
    }
    function generateQRCode() {
-     const data = "https://example.com/entry?id=" + Math.floor(Math.random() * 1000000);
-     document.getElementById('qrcode').innerHTML = '';
-     new QRCode(document.getElementById("qrcode"), {
-       text: data,
-       width: 200,
-       height: 200,
-       correctLevel: QRCode.CorrectLevel.H
-     });
-   }
+  // Tạo dữ liệu URL với id ngẫu nhiên
+  const randomId = Math.floor(Math.random() * 1000000);
+  const data = "https://example.com/entry?id=" + randomId;
+  
+  // Lấy phần tử chứa QR Code và xóa nội dung cũ
+  const qrcodeElement = document.getElementById('qrcode');
+  qrcodeElement.innerHTML = '';
+  
+  // Cấu hình QR Code với các thông số tùy chỉnh:
+  // - Giữ kích thước hiển thị 200x200px.
+  // - Ép mở phiên bản QR cụ thể thông qua thuộc tính typeNumber (ví dụ: 4 cho 33x33 module).
+  // Lưu ý: Nếu thư viện QRCode bạn đang dùng không hỗ trợ thuộc tính này, cân nhắc sử dụng
+  // một thư viện khác cho phép chỉ định phiên bản QR.
+  const options = {
+    text: data,
+    width: 200,
+    height: 200,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H,
+    typeNumber: 4  // Ép QR Code dùng phiên bản 4 thay vì tự động chọn.
+  };
+  
+  new QRCode(qrcodeElement, options);
+}
+
    // Initial
    updateTime();
    updateValidTime();
    generateQRCode();
    // Update every second
    setInterval(updateTime, 1000);
-   // Auto-refresh QR code every 60s
-   setInterval(() => {
-     generateQRCode();
-     updateValidTime();
-   }, 60000);
+   setInterval(updateValidTime, 1000);
+
 </script>
 </body>
 </html>
