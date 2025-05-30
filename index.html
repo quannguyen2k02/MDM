@@ -63,7 +63,6 @@
      height: 230px;
    }
    .refresh {
-    display: flex;
     align-items: center;
     justify-content: center;
      font-size: 14px;
@@ -119,8 +118,7 @@
 <div class="time" id="currentTime">--</div>
 <div id="qrcode"></div>
 <div class="refresh">
-  <p onclick="generateQRCode(event)" class="refresh-title">申请离场</p>
-  <p class="refresh-title">刷新二维码</p>
+  <p  onclick="generateQRCode(event)" class="refresh-title">刷新二维码</p>
 </div>
 <div class="status">已生效</div>
 <div class="valid-time" id="validTime">--</div>
@@ -184,7 +182,7 @@
    // Update every second
    setInterval(updateTime, 1000);
    setInterval(updateValidTime, 1000);
-  function fadeElement(selector, speed = 0.008) {
+  function fadeElement(selector, speed = 0.02) {
   const element = document.querySelector(selector);
   if (!element) {
     console.error("Không tìm thấy phần tử với selector:", selector);
