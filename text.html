@@ -2,229 +2,164 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code App</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <title>Tạo Mã QR Chi Tiết</title>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #2c2c3e; /* Màu nền tối giống ảnh */
-            color: #e0e0e0;
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: flex-start; /* Giữ nội dung ở trên cùng */
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            background-color: #f4f4f4;
+            padding-top: 50px; /* Thêm khoảng cách ở trên cùng */
         }
 
-        .app-container {
-            background-color: #3a3a50; /* Màu nền của khung chính */
-            border-radius: 10px;
-            padding: 0;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-        }
-
-        .header {
-            background-color: #3a3a50; /* Giữ cùng màu hoặc điều chỉnh nếu cần */
-            color: #e0e0e0;
-            padding: 15px 20px;
-            font-size: 1em;
-            text-align: center;
-            border-bottom: 1px solid #4a4a60;
-        }
-
-        .instruction-banner {
-            background-color: #e6c170; /* Màu vàng */
+        h1 {
             color: #333;
-            padding: 10px 20px;
+            margin-bottom: 30px;
+        }
+
+        .qr-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            padding: 30px;
             text-align: center;
-            font-size: 0.9em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .qr-header {
+            font-size: 1.2em;
             font-weight: bold;
-        }
-
-        .qr-content {
-            background-color: #ffffff; /* Nền trắng cho phần QR */
-            margin: 0 20px; /* Tạo khoảng cách hai bên */
-            padding: 25px;
-            border-radius: 8px; /* Bo góc cho khung trắng */
-            text-align: center;
-            position: relative; /* Để định vị các phần tử con */
-            margin-top: -10px; /* Kéo lên trên một chút để che phần bo của instruction-banner */
-            z-index: 1;
-        }
-
-        .timestamp {
             color: #555;
-            font-size: 1em;
+        }
+
+        .qr-timestamp {
+            font-size: 1.1em;
+            color: #777;
             margin-bottom: 15px;
         }
 
-        #qrcodeCanvas {
-            width: 200px; /* Kích thước canvas */
-            height: 200px; /* Kích thước canvas */
-            margin: 0 auto 15px auto; /* Căn giữa và tạo khoảng cách */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #eee; /* Viền mờ cho QR code */
+        #qrcode {
+            /* Đây là điểm mấu chốt: */
+            /* Tạo QR ở kích thước lớn (400px), nhưng hiển thị chỉ 250px */
+            /* Kích thước này sẽ cho phép các module trông nhỏ và chi tiết hơn khi scale */
+            width: 250px; /* Kích thước hiển thị mong muốn */
+            height: 250px; /* Kích thước hiển thị mong muốn */
+            
+            /* Đảm bảo hình ảnh được scale sắc nét */
+            image-rendering: pixelated;     /* Chrome, Edge, Safari, Opera */
+            image-rendering: crisp-edges;   /* Firefox */
+            image-rendering: -moz-crisp-edges; /* Older Firefox */
+            image-rendering: -o-crisp-edges;   /* Older Opera */
+            image-rendering: -webkit-optimize-contrast; /* Older Webkit */
         }
 
-        .refresh-qr {
-            color: #555555;
-            font-size: 0.9em;
-            text-decoration: none;
-            display: block;
-            margin-bottom: 10px;
+        button {
+            padding: 12px 25px;
+            font-size: 17px;
             cursor: pointer;
-        }
-        .refresh-qr:hover {
-            text-decoration: underline;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .status-text {
-            color: #4CAF50; /* Màu xanh lá cho "Đã có hiệu lực" */
-            font-size: 1.2em;
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .status-message {
+            margin-top: 20px;
+            font-size: 1.1em;
             font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .status-text.expired {
-            color: #F44336; /* Màu đỏ cho "Đã hết hiệu lực" */
+            color: green;
         }
 
-
-        .timer {
-            color: #777;
-            font-size: 0.9em;
-        }
-
-        .footer-note {
-            background-color: #3a3a50; /* Giống màu nền khung chính */
-            color: #aaa;
-            padding: 20px;
-            text-align: center;
-            font-size: 0.8em;
-            line-height: 1.4;
-            border-top: 1px solid #4a4a60;
+        .refresh-text {
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            V25020040 (Marc Nguyen)
-        </div>
-        <div class="instruction-banner">
-            将二维码对准扫描器刷码出场
-        </div>
-        <div class="qr-content">
-            <div class="timestamp" id="currentTime">2025-5-29 20:24:26</div>
-            <div id="qrcodeCanvas"></div>
-            <a href="#" class="refresh-qr" id="refreshQrLink">刷新二维码</a>
-            <div class="status-text" id="statusText">已生效</div>
-            <div class="timer" id="countdownTimer">23:19</div>
-        </div>
-        <div class="footer-note">
-            尊敬的员工您好，您已进入企业涉密区域，出于企业安全考虑，您的手机摄像头将被禁止拍摄，感谢您的配合。
+    <h1>Mã QR Truy Cập Chi Tiết</h1>
+
+    <div class="qr-container">
+        <div class="qr-header" id="qrHeader"></div>
+        <div class="qr-timestamp" id="qrTimestamp"></div>
+        <div id="qrcode">
+            </div>
+        <span class="refresh-text" onclick="generateQRCode(event)">刷新二维码 (Làm mới mã QR)</span>
+        <div class="status-message">
+            已生效 (Đã có hiệu lực)
+            <br>
+            <span id="countdown"></span>
         </div>
     </div>
 
     <script>
-        const userId = "V25020040";
-        const userName = "Marc Nguyen";
-        const qrCodeElement = document.getElementById('qrcodeCanvas');
-        const currentTimeElement = document.getElementById('currentTime');
-        const statusTextElement = document.getElementById('statusText');
-        const countdownTimerElement = document.getElementById('countdownTimer');
-        const refreshQrLink = document.getElementById('refreshQrLink');
+        let countdownInterval;
 
-        let qrcode = null;
-        let countdownInterval = null;
-        let validityMinutes = 25; // Thời gian hiệu lực của QR code (phút)
-
-        function formatNumber(num) {
-            return num < 10 ? '0' + num : num;
-        }
-
-        function updateCurrentTime() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = formatNumber(now.getMonth() + 1);
-            const day = formatNumber(now.getDate());
-            const hours = formatNumber(now.getHours());
-            const minutes = formatNumber(now.getMinutes());
-            const seconds = formatNumber(now.getSeconds());
-            currentTimeElement.textContent = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        }
-
-        function generateQRCode() {
-            // Xóa mã QR cũ (nếu có)
-            qrCodeElement.innerHTML = '';
-
-            const qrData = `UserInfo:${userId}|Name:${userName}|Timestamp:${Date.now()}|ValidityEnd:${Date.now() + validityMinutes * 60 * 1000}`;
-            
-            qrcode = new QRCode(qrCodeElement, {
-                text: qrData,
-                width: 200,
-                height: 200,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
-            });
-        }
-
-        function startCountdown(durationSeconds) {
-            let timer = durationSeconds;
-            let minutes, seconds;
-
-            if (countdownInterval) {
-                clearInterval(countdownInterval);
+        function generateQRCode(event) {
+            if (event && event.currentTarget) {
+                event.currentTarget.blur(); // Bỏ focus khỏi nút
             }
 
-            countdownInterval = setInterval(function () {
-                minutes = parseInt(timer / 60, 10);
-                seconds = parseInt(timer % 60, 10);
+            // Dữ liệu mẫu (có thể thay đổi để phản ánh thông tin thực tế)
+            // Lấy thời gian hiện tại
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
+            // Đây là phần dữ liệu chính bạn muốn mã hóa
+            // Càng dài, mã QR càng phức tạp
+            const employeeId = "V2502020040";
+            const employeeName = "Marc Nguyen";
+            const uniqueToken = Math.random().toString(36).substring(2) + Date.now().toString(36); // Token ngẫu nhiên
+            const accessData = `https://yourcompany.com/access?id=${employeeId}&name=${encodeURIComponent(employeeName)}&time=${encodeURIComponent(formattedTime)}&token=${uniqueToken}`;
 
-                countdownTimerElement.textContent = minutes + ":" + seconds;
-                statusTextElement.textContent = "已生效";
-                statusTextElement.classList.remove('expired');
+            // Cập nhật thông tin hiển thị trên mã QR
+            document.getElementById('qrHeader').textContent = `${employeeId} (${employeeName})`;
+            document.getElementById('qrTimestamp').textContent = formattedTime;
+
+            const qrcodeElement = document.getElementById('qrcode');
+            qrcodeElement.innerHTML = ''; // Xóa mã QR cũ
+
+            // Tạo mã QR với kích thước lớn hơn để có độ chi tiết cao
+            // Dù hiển thị 250px, nó được vẽ ban đầu với 400px để có nhiều "ô vuông" hơn
+            new QRCode(qrcodeElement, {
+                text: accessData,
+                width: 400, // Kích thước gốc của mã QR (độ phân giải cao)
+                height: 400, // Kích thước gốc của mã QR (độ phân giải cao)
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H // Mức độ sửa lỗi cao (Error Correction Level H)
+            });
 
 
-                if (--timer < 0) {
-                    clearInterval(countdownInterval);
-                    countdownTimerElement.textContent = "00:00";
-                    statusTextElement.textContent = "已失效"; // Hết hiệu lực
-                    statusTextElement.classList.add('expired');
-                    // Vô hiệu hóa mã QR hoặc hiển thị thông báo khác nếu cần
-                    // qrCodeElement.innerHTML = '<p style="color:red;">QR Code đã hết hạn</p>';
-                }
-            }, 1000);
         }
 
-        function refreshAll() {
-            updateCurrentTime();
-            generateQRCode();
-            startCountdown(validityMinutes * 60); // Bắt đầu đếm ngược (ví dụ 25 phút)
-        }
 
-        // Khởi tạo
-        setInterval(updateCurrentTime, 1000); // Cập nhật đồng hồ mỗi giây
-        refreshAll(); // Tạo QR và bắt đầu đếm ngược lần đầu
 
-        refreshQrLink.addEventListener('click', function(event) {
-            event.preventDefault();
-            refreshAll();
-        });
-
+        // Tự động tạo mã QR khi trang tải lần đầu
+        document.addEventListener('DOMContentLoaded', generateQRCode);
     </script>
 </body>
 </html>
