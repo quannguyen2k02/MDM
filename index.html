@@ -115,20 +115,20 @@
    .circle1{
     position: absolute;
     background-color: rgb(61, 62, 82);
-    height: 15px;
-    width: 15px;
-    left: -7.5px;
+    height: 12px;
+    width: 12px;
+    left: -6px;
     border-radius:50%;
-    bottom: -7.5px;
+    bottom: -6px;
    }
    .circle2{
     position: absolute;
     background-color: rgb(61, 62, 82);
-    height: 15px;
-    width: 15px;
-    right: -7.5px;
+    height: 12px;
+    width: 12px;
+    right: -6px;
     border-radius:50%;
-    bottom: -7.5px;
+    bottom: -6px;
    }
 </style>
 </head>
@@ -202,8 +202,8 @@
             // Dù hiển thị 250px, nó được vẽ ban đầu với 400px để có nhiều "ô vuông" hơn
             new QRCode(qrcodeElement, {
                 text: accessData,
-                width: 200, // Kích thước gốc của mã QR (độ phân giải cao)
-                height: 200, // Kích thước gốc của mã QR (độ phân giải cao)
+                width: 230, // Kích thước gốc của mã QR (độ phân giải cao)
+                height: 230, // Kích thước gốc của mã QR (độ phân giải cao)
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H // Mức độ sửa lỗi cao (Error Correction Level H)
