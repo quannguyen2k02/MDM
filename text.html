@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tạo Mã QR Chi Tiết</title>
+    <title>Tạo Mã QR Chi Tiết - Sửa Lỗi Nhấp Nháy</title>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     <style>
         body {
@@ -11,11 +11,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Giữ nội dung ở trên cùng */
+            justify-content: flex-start;
             min-height: 100vh;
             margin: 0;
             background-color: #f4f4f4;
-            padding-top: 50px; /* Thêm khoảng cách ở trên cùng */
+            padding-top: 50px;
         }
 
         h1 {
@@ -48,18 +48,15 @@
         }
 
         #qrcode {
-            /* Đây là điểm mấu chốt: */
-            /* Tạo QR ở kích thước lớn (400px), nhưng hiển thị chỉ 250px */
-            /* Kích thước này sẽ cho phép các module trông nhỏ và chi tiết hơn khi scale */
             width: 250px; /* Kích thước hiển thị mong muốn */
             height: 250px; /* Kích thước hiển thị mong muốn */
             
             /* Đảm bảo hình ảnh được scale sắc nét */
-            image-rendering: pixelated;     /* Chrome, Edge, Safari, Opera */
-            image-rendering: crisp-edges;   /* Firefox */
-            image-rendering: -moz-crisp-edges; /* Older Firefox */
-            image-rendering: -o-crisp-edges;   /* Older Opera */
-            image-rendering: -webkit-optimize-contrast; /* Older Webkit */
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -o-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
         }
 
         button {
@@ -111,14 +108,13 @@
 
     <script>
         let countdownInterval;
+        let qrCodeInstance; // Biến để lưu trữ đối tượng QRCode
 
         function generateQRCode(event) {
             if (event && event.currentTarget) {
                 event.currentTarget.blur(); // Bỏ focus khỏi nút
             }
 
-            // Dữ liệu mẫu (có thể thay đổi để phản ánh thông tin thực tế)
-            // Lấy thời gian hiện tại
             const now = new Date();
             const year = now.getFullYear();
             const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -128,35 +124,60 @@
             const seconds = String(now.getSeconds()).padStart(2, '0');
             const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-            // Đây là phần dữ liệu chính bạn muốn mã hóa
-            // Càng dài, mã QR càng phức tạp
             const employeeId = "V2502020040";
             const employeeName = "Marc Nguyen";
-            const uniqueToken = Math.random().toString(36).substring(2) + Date.now().toString(36); // Token ngẫu nhiên
+            // Sử dụng thời gian hiện tại chính xác để tạo token duy nhất và dễ theo dõi
+            const uniqueToken = Date.now().toString(36) + Math.random().toString(36).substring(2); 
             const accessData = `https://yourcompany.com/access?id=${employeeId}&name=${encodeURIComponent(employeeName)}&time=${encodeURIComponent(formattedTime)}&token=${uniqueToken}`;
 
-            // Cập nhật thông tin hiển thị trên mã QR
             document.getElementById('qrHeader').textContent = `${employeeId} (${employeeName})`;
             document.getElementById('qrTimestamp').textContent = formattedTime;
 
             const qrcodeElement = document.getElementById('qrcode');
-            qrcodeElement.innerHTML = ''; // Xóa mã QR cũ
 
-            // Tạo mã QR với kích thước lớn hơn để có độ chi tiết cao
-            // Dù hiển thị 250px, nó được vẽ ban đầu với 400px để có nhiều "ô vuông" hơn
-            new QRCode(qrcodeElement, {
-                text: accessData,
-                width: 400, // Kích thước gốc của mã QR (độ phân giải cao)
-                height: 400, // Kích thước gốc của mã QR (độ phân giải cao)
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H // Mức độ sửa lỗi cao (Error Correction Level H)
-            });
+            // Kiểm tra nếu đối tượng QR code đã tồn tại
+            if (qrCodeInstance) {
+                // Nếu tồn tại, chỉ cần cập nhật dữ liệu
+                qrCodeInstance.clear(); // Xóa mã QR hiện tại
+                qrCodeInstance.makeCode(accessData); // Tạo mã QR mới với dữ liệu mới
+            } else {
+                // Nếu chưa tồn tại, tạo mới đối tượng QRCode
+                qrCodeInstance = new QRCode(qrcodeElement, {
+                    text: accessData,
+                    width: 230, // Vẫn giữ kích thước này cho độ chi tiết gốc
+                    height: 230, // Vẫn giữ kích thước này cho độ chi tiết gốc
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
 
-
+            // Bắt đầu đếm ngược
+            startCountdown(30); // Ví dụ: QR code có hiệu lực trong 30 giây
         }
 
+        function startCountdown(duration) {
+            let timer = duration;
+            const countdownDisplay = document.getElementById('countdown');
 
+            if (countdownInterval) {
+                clearInterval(countdownInterval); // Xóa bộ đếm ngược cũ nếu có
+            }
+
+            countdownInterval = setInterval(() => {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+
+                countdownDisplay.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+                if (--timer < 0) {
+                    clearInterval(countdownInterval);
+                    countdownDisplay.textContent = 'Hết hiệu lực';
+                    // Tùy chọn: Tự động tạo lại mã QR khi hết thời gian
+                    // generateQRCode(); 
+                }
+            }, 1000);
+        }
 
         // Tự động tạo mã QR khi trang tải lần đầu
         document.addEventListener('DOMContentLoaded', generateQRCode);
