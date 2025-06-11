@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no " />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
@@ -196,7 +196,7 @@
     function updateValidTime(minutesToAdd = 3) {
       const now = new Date();
       now.setMinutes(now.getMinutes() + minutesToAdd);
-      const validTimeStr = `${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      const validTimeStr = `${pad(now.getHours() + 3) }:${pad(now.getMinutes())}:${pad(now.getSeconds())} `;
       document.getElementById('validTime').textContent = validTimeStr;
     }
     function generateQRCode(event) {
@@ -220,7 +220,7 @@
       const employeeId = "V2502020040";
       const employeeName = "Marc Nguyen";
       const uniqueToken = Math.random().toString(36).substring(2) + Date.now().toString(36); // Token ngẫu nhiên
-      const accessData = `https://yourcompany.com/access?id=${employeeId}&name=${encodeURIComponent(employeeName)}&time=${encodeURIComponent(formattedTime)}&token=${uniqueToken}`;
+      const accessData = `https://Wistron.com/access?id=${employeeId}&name=${encodeURIComponent(employeeName)}&time=${encodeURIComponent(formattedTime)}&token=${uniqueToken}`;
       const qrcodeElement = document.getElementById('qrcode');
       if(qrCodeInstance){
         qrCodeInstance.clear();
