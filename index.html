@@ -150,7 +150,7 @@
 </head>
 
 <body>
-    <div class="header">Marc Nguyen (V25020040)</div>
+    <div class="header">Marc Nguyen(V25020040)</div>
     <div class="card">
         <div class="card-header relative">
             <p>将二维码对准扫描器扫码出场</p>
@@ -185,40 +185,51 @@
             document.getElementById('currentTime').textContent = formatted;
         }
 
-        function generateQRCode(event) {
-            if (event && event.currentTarget) {
-                event.currentTarget.blur();
-            }
+        async function generateQRCode(event) {
+    // Giữ nguyên hiệu ứng blur (nếu có sự kiện click)
+    if (event && event.currentTarget) {
+        event.currentTarget.blur();
+    }
 
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    // Tạo thời gian hiện tại
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 
-            const employeeId = "V25020040";
-            const employeeName = "Marc Nguyen";
-            const uniqueToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
-            const accessData =
-                `https://Wistron.com/access?id=${employeeId}&name=${encodeURIComponent(employeeName)}&time=${encodeURIComponent(formattedTime)}&token=${uniqueToken}`;
-            const qrcodeElement = document.getElementById('qrcode');
-            if (qrCodeInstance) {
-                qrCodeInstance.clear();
-                qrCodeInstance.makeCode(accessData);
-            } else {
-                qrCodeInstance = new QRCode(qrcodeElement, {
-                    text: accessData,
-                    width: 230,
-                    height: 230,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H
-                });
-            }
-        }
+    // Dữ liệu cố định
+    const employeeId = "V25020040";
+    const employeeName = "Marc Nguyen";
+    const uniqueToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const accessData =
+        `https://Wistron.com/access?id=${employeeId}&name=${encodeURIComponent(employeeName)}&time=${encodeURIComponent(formattedTime)}&token=${uniqueToken}`;
+
+    // ----- THÊM DELAY NGẪU NHIÊN TỪ 1-3 GIÂY -----
+    
+    // ----------------------------------------------
+
+    // Tạo QR code (giữ nguyên logic cũ)
+    const qrcodeElement = document.getElementById('qrcode');
+    if (qrCodeInstance) {
+        qrCodeInstance.clear();
+        const delayMs = Math.floor(Math.random() * 2000) + 500; // 1000 → 3000 ms
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        qrCodeInstance.makeCode(accessData);
+    } else {
+        qrCodeInstance = new QRCode(qrcodeElement, {
+            text: accessData,
+            width: 230,
+            height: 230,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+    }
+}
 
         // Initial
         updateTime();
